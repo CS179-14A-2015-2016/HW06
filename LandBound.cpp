@@ -43,16 +43,20 @@ float tank_speedy2 = 0;
 //tank position
 float tank1_posx = land_width / 2;
 float tank1_posy = land_height;
-float tank2_posx = width - (land_width / 2) - 8;
+float tank2_posx = width - (land_width / 2) - 8 - tank_width;
 float tank2_posy = land_height;
 
 //powergauge
 float p1gauge_posx = tank1_posx;
-float p1gauge_posy = land_height * 3;
+float p2gauge_posx = tank2_posx;
 
-float gauge_height = 1;
+float gauge_posy = land_height * 3;
+
+float gauge1_height = 1;
+float gauge2_height = 1;
+
 float gauge_width = 10;
-float gauge_maxheight = p1gauge_posy + 30;
+float gauge_maxheight = gauge_posy + 30;
 float gauge_fill = 2;
 
 //scoring
@@ -121,19 +125,35 @@ return (n < upper) * n + !(n < upper) * upper;
 //keyboard controls
 void keyboard() {
 	//gauge power
-	if (GetAsyncKeyState(VK_W))
+	if (GetAsyncKeyState(VK_D))
 	{
-		if (gauge_height <= gauge_maxheight)
+		if (gauge1_height <= gauge_maxheight)
 		{
-			gauge_height += gauge_fill;
+			gauge1_height += gauge_fill;
 		}
 	}
 
-	if (GetAsyncKeyState(VK_S))
+	if (GetAsyncKeyState(VK_A))
 	{
-		if (gauge_height > 1)
+		if (gauge1_height > 1)
 		{
-			gauge_height -= gauge_fill;
+			gauge1_height -= gauge_fill;
+		}
+	}
+
+	if (GetAsyncKeyState(VK_RIGHT))
+	{
+		if (gauge2_height <= gauge_maxheight)
+		{
+			gauge2_height += gauge_fill;
+		}
+	}
+
+	if (GetAsyncKeyState(VK_LEFT))
+	{
+		if (gauge2_height > 1)
+		{
+			gauge2_height -= gauge_fill;
 		}
 	}
 
@@ -325,8 +345,8 @@ void draw() {
 	boxDraw(tank2_posx, tank2_posy, tank_width, tank_height);
 
 	//gauge draw
-	boxDraw(p1gauge_posx, p1gauge_posy, gauge_width, gauge_height);
-
+	boxDraw(p1gauge_posx, gauge_posy, gauge_width, gauge1_height);
+	boxDraw(p2gauge_posx, gauge_posy, gauge_width, gauge2_height);
 
 	//score display
 	textDraw(width / 2 - 30, height - 30, inttostr(p1score) + " : " + inttostr(p2score));
