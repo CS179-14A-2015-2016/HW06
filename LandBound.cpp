@@ -53,7 +53,7 @@ float p1gauge_posy = land_height * 3;
 float gauge_height = 1;
 float gauge_width = 10;
 float gauge_maxheight = p1gauge_posy + 30;
-float gauge_fill = 1;
+float gauge_fill = 2;
 
 //scoring
 int p1score = 0;
@@ -131,7 +131,7 @@ void keyboard() {
 
 	if (GetAsyncKeyState(VK_S))
 	{
-		if (gauge_height >= p1gauge_posy)
+		if (gauge_height > 1)
 		{
 			gauge_height -= gauge_fill;
 		}
