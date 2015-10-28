@@ -60,6 +60,7 @@ float bulletY = tank1_posy + (tank_width/2);
 bool bulletFire = false;
 float bulletSize = 5;
 int bullet_segments = 8;
+float windVelocity = 0;
 //turns
 bool player2 = false;
 bool gameStart = false;
@@ -264,6 +265,26 @@ void boom()
 		
 	}
 }
+void bulletMove()
+{
+	if(gameStart == true)	
+	{
+		if(player2 == false)
+		{
+			bulletX+= ((velocityOriginal+windVelocity)*time)*cos(launchAngle);
+			bullety+= (velocityOriginal*time)*sin(launchAngle) - ((9.8*(time*time))/2);
+		}
+		else if(palyer2 == true)
+		{
+			bulletX-= ((velocityOriginal+windVelocity)*time)*cos(launchAngle);
+			bullety+= (velocityOriginal*time)*sin(launchAngle) - ((9.8*(time*time))/2);
+		}
+		
+	}
+	
+	
+}
+
 //draw on screen
 void draw() {
 	//clearing the screen
