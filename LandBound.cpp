@@ -252,6 +252,7 @@ void collisionChecker(){
 void boom()
 {
 	gameStart = false;
+	t = 0;
 	if(player2 == true)
 	{
 		bulletX = tank1_posx + (tank_width/2);
@@ -266,6 +267,7 @@ void boom()
 		player2 = true;
 		
 	}
+	
 }
 void bulletMove()
 {
@@ -325,10 +327,7 @@ void update(int upvalue) {
 	{
 		t += 1;
 	}
-	else if if(gameStart == false)
-	{
-		t = 0;
-	}
+	
 	//ball2Move();
 
 	//calls update in millisecs
