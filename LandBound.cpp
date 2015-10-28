@@ -325,6 +325,10 @@ void update(int upvalue) {
 	{
 		t += 1;
 	}
+	else if if(gameStart == false)
+	{
+		t = 0;
+	}
 	//ball2Move();
 
 	//calls update in millisecs
