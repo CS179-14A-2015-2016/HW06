@@ -66,8 +66,9 @@ int p1life = 5;
 int p2life = 5;
 
 //bullet
-float velocityOriginal;
-float launchAngle;
+float velocityOriginal = 0;
+float input = 0;
+float launchAngle = input * 180 / 3.1415926;
 float bulletX = tank1_posx + (tank_width / 2);
 float bulletY = tank1_posy + (tank_width / 2);
 bool bulletFire = false;
@@ -162,7 +163,7 @@ void keyboard() {
 	{
 		if ((launchAngle * 180 / 3.1415926)<180)
 		{
-			launchAngle +=2
+			input +=2
 		}
 	}
 	
@@ -170,7 +171,7 @@ void keyboard() {
 	{
 		if ((launchAngle * 180 / 3.1415926)>0)
 		{
-			launchAngle -=2
+			input -=2
 		}
 	}
 
@@ -179,14 +180,14 @@ void keyboard() {
 	{
 		if ((launchAngle * 180 / 3.1415926)<180)
 		{
-			launchAngle +=2
+			input +=2
 		}
 	}
 	if (GetAsyncKeyState(VK_DOWN))
 	{
 		if ((launchAngle * 180 / 3.1415926)>0)
 		{
-			launchAngle -=2
+			input -=2
 		}
 	}
 	*/
