@@ -70,7 +70,7 @@ float velocityOriginal = 0;
 float input = 0;
 float launchAngle = input * 180 / 3.1415926;
 float bulletX = tank1_posx + (tank_width / 2);
-float bulletY = tank1_posy + (tank_width / 2);
+float bulletY = tank1_posy + tank_height + 5;
 bool bulletFire = false;
 float bulletSize = 5;
 int bullet_segments = 8;
@@ -81,27 +81,6 @@ float t = 0;
 bool player2 = false;
 bool gameStart = false;
 
-/*
-//ball shenanigans
-//ball1
-float bulletX = width / 2 + 10;
-float bulletY = height / 2;
-float ball_dirx = -1.0;
-float ball_diry = 1.0;
-
-//ball2
-float ball2_posx = width / 2 - 10;
-float ball2_posy = height / 2;
-float ball2_dirx = 1.0;
-float ball2_diry = -1.0;
-
-float ball_speedx1 = 4;
-float ball_speedy1 = 0;
-float ball_speedx2 = -4;
-float ball_speedy2 = 0;
-float ball_radius = 5;
-int ball_segments = 8;
-*/
 
 //function functions
 
@@ -125,7 +104,7 @@ return (n < upper) * n + !(n < upper) * upper;
 
 //keyboard controls
 void keyboard() {
-	//gauge power
+	//Player 1 controls
 	if (GetAsyncKeyState(VK_D))
 	{
 		if (gauge1_height <= gauge_maxheight)
@@ -142,23 +121,6 @@ void keyboard() {
 		}
 	}
 
-	if (GetAsyncKeyState(VK_RIGHT))
-	{
-		if (gauge2_height <= gauge_maxheight)
-		{
-			gauge2_height += gauge_fill;
-		}
-	}
-
-	if (GetAsyncKeyState(VK_LEFT))
-	{
-		if (gauge2_height > 1)
-		{
-			gauge2_height -= gauge_fill;
-		}
-	}
-
-	/*
 	if (GetAsyncKeyState(VK_W))
 	{
 		if ((launchAngle * 180 / 3.1415926)<180)
@@ -175,14 +137,14 @@ void keyboard() {
 		}
 	}
 
-	//right paddle
-	if (GetAsyncKeyState(VK_UP))
+	//Player 2 controls
 	{
 		if ((launchAngle * 180 / 3.1415926)<180)
 		{
 			input +=2
 		}
 	}
+	
 	if (GetAsyncKeyState(VK_DOWN))
 	{
 		if ((launchAngle * 180 / 3.1415926)>0)
@@ -190,7 +152,21 @@ void keyboard() {
 			input -=2
 		}
 	}
-	*/
+	if (GetAsyncKeyState(VK_RIGHT))
+	{
+		if (gauge2_height <= gauge_maxheight)
+		{
+			gauge2_height += gauge_fill;
+		}
+	}
+
+	if (GetAsyncKeyState(VK_LEFT))
+	{
+		if (gauge2_height > 1)
+		{
+			gauge2_height -= gauge_fill;
+		}
+	}
 }
 
 
@@ -234,8 +210,7 @@ void ballDraw(float cx, float cy, float r, int segments) {
 	glBegin(GL_LINE_LOOP);
 	for (int i = 0; i < segments; i++) {
 		glVertex2f(varx + cx, vary + cy); //outputs vertex
-
-										  //apply rotation matrix
+		  //apply rotation matrix
 		t = varx;
 		varx = cos * varx - sin * vary;
 		vary = sin * t + cos * vary;
@@ -249,14 +224,14 @@ void boom()
 	if (player2 == true)
 	{
 		bulletX = tank1_posx + (tank_width / 2);
-		bulletY = tank1_posy + (tank_height / 2);
+		bulletY = tank1_posy + tank_height+5;
 		player2 = false;
 
 	}
 	else if (player2 == false)
 	{
 		bulletX = tank2_posx + (tank_width / 2);
-		bulletY = tank2_posy + (tank_height / 2);
+		bulletY = tank2_posy + tank_height+5;
 		player2 = true;
 
 	}
