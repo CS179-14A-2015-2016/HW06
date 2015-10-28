@@ -61,6 +61,8 @@ bool bulletFire = false;
 float bulletSize = 5;
 int bullet_segments = 8;
 float windVelocity = 0;
+float t = 0;
+
 //turns
 bool player2 = false;
 bool gameStart = false;
@@ -271,13 +273,13 @@ void bulletMove()
 	{
 		if(player2 == false)
 		{
-			bulletX+= ((velocityOriginal+windVelocity)*time)*cos(launchAngle);
-			bullety+= (velocityOriginal*time)*sin(launchAngle) - ((9.8*(time*time))/2);
+			bulletX+= ((velocityOriginal+windVelocity)*t)*cos(launchAngle);
+			bullety+= (velocityOriginal*t)*sin(launchAngle) - ((9.8*(t*t))/2);
 		}
-		else if(palyer2 == true)
+		else if(player2 == true)
 		{
-			bulletX-= ((velocityOriginal+windVelocity)*time)*cos(launchAngle);
-			bullety+= (velocityOriginal*time)*sin(launchAngle) - ((9.8*(time*time))/2);
+			bulletX-= ((velocityOriginal+windVelocity)*t)*cos(launchAngle);
+			bullety+= (velocityOriginal*t)*sin(launchAngle) - ((9.8*(t*t))/2);
 		}
 		
 	}
@@ -294,7 +296,7 @@ void draw() {
 	//put draw codes below
 
 	//ball display
-	//ballDraw(bulletX, bulletY, ball_radius, ball_segments);
+	ballDraw(bulletX, bulletY, bulletSize, bullet_segments);
 	//ballDraw(ball2_posx, ball2_posy, ball_radius, ball_segments);
 
 	//land display
@@ -318,7 +320,11 @@ void update(int upvalue) {
 	//keyboard();
 
 	//ball movement
-	//ballMove();
+	bulletMove();
+	if(gameStart == true)
+	{
+		t += 1;
+	}
 	//ball2Move();
 
 	//calls update in millisecs
