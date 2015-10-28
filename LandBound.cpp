@@ -158,33 +158,35 @@ void keyboard() {
 	}
 
 	/*
+	if (GetAsyncKeyState(VK_W))
+	{
+		if ((launchAngle * 180 / 3.1415926)<180)
+		{
+			launchAngle +=2
+		}
+	}
+	
 	if (GetAsyncKeyState(VK_S))
 	{
-		if ((leftpaddle_y) >= 0)
+		if ((launchAngle * 180 / 3.1415926)>0)
 		{
-		paddle_speedy1 = -6;
-		leftpaddle_y += paddle_speedy1;
-		paddle_speedy1 = 1; leftpaddle_y;
+			launchAngle -=2
 		}
 	}
 
 	//right paddle
 	if (GetAsyncKeyState(VK_UP))
 	{
-		if ((rightpaddle_y + paddle_height) <= height)
+		if ((launchAngle * 180 / 3.1415926)<180)
 		{
-		paddle_speedy2 = 6;
-		rightpaddle_y += paddle_speedy2;
-		paddle_speedy2 = 1;
+			launchAngle +=2
 		}
 	}
 	if (GetAsyncKeyState(VK_DOWN))
 	{
-		if ((rightpaddle_y) >= 0)
+		if ((launchAngle * 180 / 3.1415926)>0)
 		{
-		paddle_speedy2 = -6;
-		rightpaddle_y += paddle_speedy2;
-		paddle_speedy2 = 1;
+			launchAngle -=2
 		}
 	}
 	*/
