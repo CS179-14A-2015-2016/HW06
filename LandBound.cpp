@@ -1,4 +1,4 @@
-// PongGame.cpp : Pong game using c++ and openGL *sigh*.
+// LandBound.cpp : GunBound game using c++ and openGL *omega sigh*.
 
 #include "stdafx.h"
 
@@ -43,7 +43,7 @@ float tank_speedy2 = 0;
 //tank position
 float tank1_posx = land_width / 2;
 float tank1_posy = land_height;
-float tank2_posx = width - (land_width / 2);
+float tank2_posx = width - (land_width / 2) - 8; 
 float tank2_posy = land_height;
 
 //scoring
@@ -55,8 +55,8 @@ int p2life = 5;
 //bullet
 float velocityOriginal;
 float launchAngle;
-float bulletX = tank1_posx + (tank_width/2);
-float bulletY = tank1_posy + (tank_width/2);
+float bulletX = tank1_posx + (tank_width / 2);
+float bulletY = tank1_posy + (tank_width / 2);
 bool bulletFire = false;
 float bulletSize = 5;
 int bullet_segments = 8;
@@ -111,49 +111,50 @@ return (n < upper) * n + !(n < upper) * upper;
 /*
 //keyboard controls
 void keyboard() {
-	//left paddle
-	if (GetAsyncKeyState(VK_W))
-	{
-		if ((leftpaddle_y + paddle_height) <= height)
-		{
-			paddle_speedy1 = 6;
-			leftpaddle_y += paddle_speedy1;
-			paddle_speedy1 = 1;
-		}
-	}
+//left paddle
+if (GetAsyncKeyState(VK_W))
+{
+if ((leftpaddle_y + paddle_height) <= height)
+{
+paddle_speedy1 = 6;
+leftpaddle_y += paddle_speedy1;
+paddle_speedy1 = 1;
+}
+}
 
-	if (GetAsyncKeyState(VK_S))
-	{
-		if ((leftpaddle_y) >= 0)
-		{
-			paddle_speedy1 = -6;
-			leftpaddle_y += paddle_speedy1;
-			paddle_speedy1 = 1; leftpaddle_y;
-		}
-	}
+if (GetAsyncKeyState(VK_S))
+{
+if ((leftpaddle_y) >= 0)
+{
+paddle_speedy1 = -6;
+leftpaddle_y += paddle_speedy1;
+paddle_speedy1 = 1; leftpaddle_y;
+}
+}
 
-	//right paddle
-	if (GetAsyncKeyState(VK_UP))
-	{
-		if ((rightpaddle_y + paddle_height) <= height)
-		{
-			paddle_speedy2 = 6;
-			rightpaddle_y += paddle_speedy2;
-			paddle_speedy2 = 1;
-		}
-	}
-	if (GetAsyncKeyState(VK_DOWN))
-	{
-		if ((rightpaddle_y) >= 0)
-		{
-			paddle_speedy2 = -6;
-			rightpaddle_y += paddle_speedy2;
-			paddle_speedy2 = 1;
-		}
-	}
+//right paddle
+if (GetAsyncKeyState(VK_UP))
+{
+if ((rightpaddle_y + paddle_height) <= height)
+{
+paddle_speedy2 = 6;
+rightpaddle_y += paddle_speedy2;
+paddle_speedy2 = 1;
+}
+}
+if (GetAsyncKeyState(VK_DOWN))
+{
+if ((rightpaddle_y) >= 0)
+{
+paddle_speedy2 = -6;
+rightpaddle_y += paddle_speedy2;
+paddle_speedy2 = 1;
+}
+}
 }
 
 */
+
 //makes gl recognized 2d usage
 void use2D(int width, int height) {
 	glViewport(0, 0, width, height);
@@ -203,7 +204,47 @@ void ballDraw(float cx, float cy, float r, int segments) {
 	}
 	glEnd();
 }
-void collisionChecker(){
+
+void boom()
+{
+	gameStart = false;
+	if (player2 == true)
+	{
+		bulletX = tank1_posx + (tank_width / 2);
+		bulletY = tank1_posy + (tank_height / 2);
+		player2 = false;
+
+	}
+	else if (player2 == false)
+	{
+		bulletX = tank2_posx + (tank_width / 2);
+		bulletY = tank2_posy + (tank_height / 2);
+		player2 = true;
+
+	}
+}
+
+void bulletMove()
+{
+	if (gameStart == true)
+	{
+		if (player2 == false)
+		{
+			bulletX += ((velocityOriginal + windVelocity)*t)*cos(launchAngle);
+			bulletY += (velocityOriginal*t)*sin(launchAngle) - ((9.8*(t*t)) / 2);
+		}
+		else if (player2 == true)
+		{
+			bulletX -= ((velocityOriginal + windVelocity)*t)*cos(launchAngle);
+			bulletY += (velocityOriginal*t)*sin(launchAngle) - ((9.8*(t*t)) / 2);
+		}
+
+	}
+
+
+}
+
+void collisionChecker() {
 	//left wall collision
 	if (bulletX < 0) {
 		boom();
@@ -219,74 +260,33 @@ void collisionChecker(){
 	{
 		boom();
 	}
-	if(gameStart = true)
+	if (gameStart = true)
 	{
-		if (( bulletX >= tank1_posx) &&
+		if ((bulletX >= tank1_posx) &&
 			(bulletX <= tank1_posx + tank_width) &&
 			(bulletY <= tank1_posy + tank_height) &&
 			(bulletY >= tank1_posy))
+		{
+			if (player2 == true)
 			{
-				if(player2 == true)
-				{
-					p2score += 1;
-				}
-				p1life -= 1;
-				boom();
+				p2score += 1;
 			}
-		if (( bulletX >= tank2_posx) &&
+			p1life -= 1;
+			boom();
+		}
+		if ((bulletX >= tank2_posx) &&
 			(bulletX <= tank2_posx + tank_width) &&
 			(bulletY <= tank2_posy + tank_height) &&
 			(bulletY >= tank2_posy))
+		{
+			if (player2 == false)
 			{
-				if(player2 == false)
-				{
-					p1score += 1;
-				}
-				p2life -= 1;
-				boom();
+				p1score += 1;
 			}
-	}
-}
-
-
-void boom()
-{
-	gameStart = false;
-	t = 0;
-	if(player2 == true)
-	{
-		bulletX = tank1_posx + (tank_width/2);
-		bulletY = tank1_posy + (tank_height/2);
-		player2 = false;
-
-	}
-	else if (player2 == false)
-	{
-		bulletX = tank2_posx + (tank_width/2);
-		bulletY = tank2_posy + (tank_height/2);
-		player2 = true;
-		
-	}
-	
-}
-void bulletMove()
-{
-	if(gameStart == true)	
-	{
-		if(player2 == false)
-		{
-			bulletX+= ((velocityOriginal+windVelocity)*t)*cos(launchAngle);
-			bullety+= (velocityOriginal*t)*sin(launchAngle) - ((9.8*(t*t))/2);
+			p2life -= 1;
+			boom();
 		}
-		else if(player2 == true)
-		{
-			bulletX-= ((velocityOriginal+windVelocity)*t)*cos(launchAngle);
-			bullety+= (velocityOriginal*t)*sin(launchAngle) - ((9.8*(t*t))/2);
-		}
-		
 	}
-	
-	
 }
 
 //draw on screen
@@ -303,7 +303,7 @@ void draw() {
 
 	//land display
 	boxDraw(0, 0, land_width, land_height);
-	boxDraw(width - land_width, 0, land_width, land_height);
+	boxDraw(width - land_width - 8, 0, land_width, land_height);
 
 	//tank draw
 	boxDraw(tank1_posx, tank1_posy, tank_width, tank_height);
@@ -323,11 +323,11 @@ void update(int upvalue) {
 
 	//ball movement
 	bulletMove();
-	if(gameStart == true)
+
+	if (gameStart == true)
 	{
 		t += 1;
 	}
-	
 	//ball2Move();
 
 	//calls update in millisecs
