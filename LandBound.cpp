@@ -328,6 +328,7 @@ void draw() {
 
 	//score display
 	textDraw(width / 2 - 30, height - 30, inttostr(p1score) + " : " + inttostr(p2score));
+	textDraw(width - 60, height - 25, inttostr(launchAngle) + " deg");
 
 	//swapping buffers
 	glutSwapBuffers();
