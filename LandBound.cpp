@@ -59,7 +59,7 @@ float bulletX = tank1_posx + (tank_width/2);
 float bulletY = tank1_posy + (tank_width/2);
 bool bulletFire = false;
 float bulletSize = 5;
-
+int bullet_segments = 8;
 //turns
 bool player2 = false;
 bool gameStart = false;
