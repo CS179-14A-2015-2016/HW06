@@ -62,8 +62,6 @@ float gauge_fill = 2;
 //scoring
 int p1score = 0;
 int p2score = 0;
-int p1life = 5;
-int p2life = 5;
 
 //bullet
 float velocityOriginal = 0;
@@ -75,7 +73,7 @@ bool bulletFire = false;
 float bulletSize = 5;
 int bullet_segments = 8;
 float windVelocity = 0;
-float t = 0;
+float ts = 0;
 
 //turns
 bool player2 = false;
@@ -243,13 +241,13 @@ void bulletMove()
 	{
 		if (player2 == false)
 		{
-			bulletX += ((velocityOriginal + windVelocity)*t)*cos(launchAngle);
-			bulletY += (velocityOriginal*t)*sin(launchAngle) - ((9.8*(t*t)) / 2);
+			bulletX += ((velocityOriginal + windVelocity)*ts)*cos(launchAngle);
+			bulletY += (velocityOriginal*ts)*sin(launchAngle) - ((9.8*(ts*ts)) / 2);
 		}
 		else if (player2 == true)
 		{
 			bulletX -= ((velocityOriginal + windVelocity)*t)*cos(launchAngle);
-			bulletY += (velocityOriginal*t)*sin(launchAngle) - ((9.8*(t*t)) / 2);
+			bulletY += (velocityOriginal*ts)*sin(launchAngle) - ((9.8*(ts*ts)) / 2);
 		}
 
 	}
@@ -284,7 +282,6 @@ void collisionChecker() {
 			{
 				p2score += 1;
 			}
-			p1life -= 1;
 			boom();
 		}
 		if ((bulletX >= tank2_posx) &&
@@ -296,7 +293,6 @@ void collisionChecker() {
 			{
 				p1score += 1;
 			}
-			p2life -= 1;
 			boom();
 		}
 	}
@@ -344,7 +340,7 @@ void update(int upvalue) {
 
 	if (gameStart == true)
 	{
-		t += 1;
+		ts += 1/60;
 	}
 	//ball2Move();
 
@@ -361,7 +357,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(width, height);
-	glutCreateWindow("Le Pong");
+	glutCreateWindow("Worchbound");
 
 	//uses the void functions
 	glutDisplayFunc(draw);
