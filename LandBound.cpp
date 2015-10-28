@@ -1,4 +1,4 @@
-// LandBound.cpp : GunBound game using c++ and openGL *omega sigh*.
+// PongGame.cpp : Pong game using c++ and openGL *sigh*.
 
 #include "stdafx.h"
 
@@ -43,8 +43,17 @@ float tank_speedy2 = 0;
 //tank position
 float tank1_posx = land_width / 2;
 float tank1_posy = land_height;
-float tank2_posx = width - (land_width / 2) - 8; 
+float tank2_posx = width - (land_width / 2) - 8;
 float tank2_posy = land_height;
+
+//powergauge
+float p1gauge_posx = tank1_posx;
+float p1gauge_posy = land_height * 3;
+
+float gauge_height = 1;
+float gauge_width = 10;
+float gauge_maxheight = p1gauge_posy + 30;
+float gauge_fill = 1;
 
 //scoring
 int p1score = 0;
@@ -108,52 +117,59 @@ return (n < upper) * n + !(n < upper) * upper;
 */
 
 //void functions
-/*
+
 //keyboard controls
 void keyboard() {
-//left paddle
-if (GetAsyncKeyState(VK_W))
-{
-if ((leftpaddle_y + paddle_height) <= height)
-{
-paddle_speedy1 = 6;
-leftpaddle_y += paddle_speedy1;
-paddle_speedy1 = 1;
-}
+	//gauge power
+	if (GetAsyncKeyState(VK_W))
+	{
+		if (gauge_height <= gauge_maxheight)
+		{
+			gauge_height += gauge_fill;
+		}
+	}
+
+	if (GetAsyncKeyState(VK_S))
+	{
+		if (gauge_height >= p1gauge_posy)
+		{
+			gauge_height -= gauge_fill;
+		}
+	}
+
+	/*
+	if (GetAsyncKeyState(VK_S))
+	{
+		if ((leftpaddle_y) >= 0)
+		{
+		paddle_speedy1 = -6;
+		leftpaddle_y += paddle_speedy1;
+		paddle_speedy1 = 1; leftpaddle_y;
+		}
+	}
+
+	//right paddle
+	if (GetAsyncKeyState(VK_UP))
+	{
+		if ((rightpaddle_y + paddle_height) <= height)
+		{
+		paddle_speedy2 = 6;
+		rightpaddle_y += paddle_speedy2;
+		paddle_speedy2 = 1;
+		}
+	}
+	if (GetAsyncKeyState(VK_DOWN))
+	{
+		if ((rightpaddle_y) >= 0)
+		{
+		paddle_speedy2 = -6;
+		rightpaddle_y += paddle_speedy2;
+		paddle_speedy2 = 1;
+		}
+	}
+	*/
 }
 
-if (GetAsyncKeyState(VK_S))
-{
-if ((leftpaddle_y) >= 0)
-{
-paddle_speedy1 = -6;
-leftpaddle_y += paddle_speedy1;
-paddle_speedy1 = 1; leftpaddle_y;
-}
-}
-
-//right paddle
-if (GetAsyncKeyState(VK_UP))
-{
-if ((rightpaddle_y + paddle_height) <= height)
-{
-paddle_speedy2 = 6;
-rightpaddle_y += paddle_speedy2;
-paddle_speedy2 = 1;
-}
-}
-if (GetAsyncKeyState(VK_DOWN))
-{
-if ((rightpaddle_y) >= 0)
-{
-paddle_speedy2 = -6;
-rightpaddle_y += paddle_speedy2;
-paddle_speedy2 = 1;
-}
-}
-}
-
-*/
 
 //makes gl recognized 2d usage
 void use2D(int width, int height) {
@@ -180,7 +196,6 @@ void boxDraw(float x, float y, float width, float height) {
 	glVertex2f(x, y + height);
 	glEnd();
 }
-
 
 //draw the ball
 void ballDraw(float cx, float cy, float r, int segments) {
@@ -309,6 +324,10 @@ void draw() {
 	boxDraw(tank1_posx, tank1_posy, tank_width, tank_height);
 	boxDraw(tank2_posx, tank2_posy, tank_width, tank_height);
 
+	//gauge draw
+	boxDraw(p1gauge_posx, p1gauge_posy, gauge_width, gauge_height);
+
+
 	//score display
 	textDraw(width / 2 - 30, height - 30, inttostr(p1score) + " : " + inttostr(p2score));
 
@@ -319,7 +338,7 @@ void draw() {
 //screen update handler
 void update(int upvalue) {
 	//input
-	//keyboard();
+	keyboard();
 
 	//ball movement
 	bulletMove();
