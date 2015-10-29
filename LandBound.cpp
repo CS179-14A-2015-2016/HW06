@@ -210,14 +210,6 @@ void keyboard() {
 		}
 	}
 
-	if (GetAsyncKeyState(VK_DOWN))
-	{
-		if (rotAngle2 <= 360.0)
-		{
-			rotAngle2 += 1.0;
-		}
-	}
-
 	if (GetAsyncKeyState(VK_F))
 	{
 		bulletX2 = 0;
@@ -338,6 +330,7 @@ void boom()
 		bulletY1 = tank1_posy + (tank_height / 2);
 		windVelocity = steprand();
 		player2 = true;
+		ts = 0;
 	}
 	else if (player2 == true)
 	{
@@ -345,6 +338,7 @@ void boom()
 		bulletY2 = tank2_posy + (tank_height / 2);
 		windVelocity = steprand();
 		player2 = false;
+		ts = 0;
 	}
 }
 
@@ -396,15 +390,15 @@ void bulletMove()
 	{
 		if (player2 == false)
 		{
-			bulletX1 += velocityX1*cos(theta1) + storewind1;
-			bulletY1 += velocityY1*sin(theta1);
+			bulletX1 += velocityX1*cos(theta1)*ts + storewind2;
+			bulletY1 += velocityY1*sin(theta1)*ts - ((ts*ts*9.8)/2);
 			collisionChecker();
 		}
 
 		else if (player2 == true)
 		{
-			bulletX2 += velocityX2*cos(theta2) + storewind2;
-			bulletY2 += velocityY2*sin(theta2);
+			bulletX2 += velocityX2*cos(theta2)*ts + storewind2;
+			bulletY2 += velocityY2*sin(theta2)*ts - ((ts*ts*9.8)/2);
 			collisionChecker();
 		}		
 
@@ -474,6 +468,7 @@ void update(int upvalue) {
 	keyboard();
 
 	bulletMove();
+	ts += 1/600;
 
 	//calls update in millisecs
 	glutTimerFunc(refresh, update, 0);
