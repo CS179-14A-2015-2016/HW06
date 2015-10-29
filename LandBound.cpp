@@ -8,10 +8,17 @@
 #include <conio.h>
 #include <sstream>
 #include <math.h>
+#include <random>
 #include <gl\GL.h>
 #include <gl\GLU.h>
 #include "GL/freeglut.h"
 #pragma comment(lib, "OpenGL32.lib") //specify linker options
+
+using namespace std;
+
+random_device ran;
+mt19937 dev(ran());
+mt19937 gen(ran());
 
 //key define
 #define VK_W 0x57
@@ -21,8 +28,6 @@
 #define VK_F 0x46
 #define VK_L 0x4C
 #define VK_SPACE 0x20
-
-using namespace std;
 
 //window size and refresh rate
 int width = 1000;
@@ -74,6 +79,8 @@ float bulletY2 = 0.0;
 float bulletSize = 5; //radius
 int bullet_segments = 8;
 float windVelocity = 0;
+float storewind1 = 0;
+float storewind2 = 0;
 float ts = 0;
 
 //bools
@@ -108,6 +115,14 @@ int ball_segments = 8;
 */
 
 //function functions
+
+int steprand()
+{
+	int wind = 5;
+	uniform_int_distribution<> dis(-wind, wind);
+	int a = dis(dev);
+	return a;
+}
 
 //int to string function
 string inttostr(int x) {
@@ -209,6 +224,8 @@ void keyboard() {
 		bulletY2 = 0;
 		velocityX2 = 0;
 		velocityY2 = 0;
+		storewind2 = 0;
+		storewind1 = windVelocity;
 		bulletX1 = tank1_posx + (tank_width / 2);
 		bulletY1 = tank1_posy + (tank_width / 2);
 		velocityX1 = gauge1_height / 5;
@@ -223,6 +240,8 @@ void keyboard() {
 		bulletY1 = 0;
 		velocityX1 = 0;
 		velocityY1 = 0;
+		storewind1 = 0;
+		storewind2 = windVelocity;
 		bulletX2 = tank2_posx + (tank_width / 2);
 		bulletY2 = tank2_posy + (tank_width / 2);
 		velocityX2 = gauge2_height / 5;
@@ -317,12 +336,14 @@ void boom()
 	{
 		bulletX1 = tank1_posx + (tank_width / 2);
 		bulletY1 = tank1_posy + (tank_height / 2);
+		windVelocity = steprand();
 		player2 = true;
 	}
 	else if (player2 == true)
 	{
 		bulletX2 = tank2_posx + (tank_width / 2);
 		bulletY2 = tank2_posy + (tank_height / 2);
+		windVelocity = steprand();
 		player2 = false;
 	}
 }
@@ -375,14 +396,14 @@ void bulletMove()
 	{
 		if (player2 == false)
 		{
-			bulletX1 += velocityX1*cos(theta1);
+			bulletX1 += velocityX1*cos(theta1) + storewind1;
 			bulletY1 += velocityY1*sin(theta1);
 			collisionChecker();
 		}
 
 		else if (player2 == true)
 		{
-			bulletX2 += velocityX2*cos(theta2);
+			bulletX2 += velocityX2*cos(theta2) + storewind2;
 			bulletY2 += velocityY2*sin(theta2);
 			collisionChecker();
 		}		
@@ -442,7 +463,7 @@ void draw() {
 
 	//score display
 	textDraw(width / 2 - 30, height - 30, inttostr(rotAngle1) + " " + inttostr(p1life) + " : " + inttostr(p2life) + " " + inttostr(abs(rotAngle2 - 360)));
-
+	textDraw(width / 2, height - 50, inttostr(windVelocity));
 	//swapping buffers
 	glutSwapBuffers();
 }
