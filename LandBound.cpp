@@ -1,4 +1,4 @@
-// PongGame.cpp : Pong game using c++ and openGL *sigh*.
+// LandBound.cpp : Gunbound game using c++ and openGL *omega sigh*.
 
 #include "stdafx.h"
 
@@ -35,10 +35,6 @@ float land_height = 50;
 //tank specs
 float tank_width = 20;
 float tank_height = 10;
-float tank_speedx1 = 1;
-float tank_speedy1 = 0;
-float tank_speedx2 = 1;
-float tank_speedy2 = 0;
 
 //tank position
 float tank1_posx = land_width / 2;
@@ -62,15 +58,16 @@ float gauge_fill = 2;
 //scoring
 int p1score = 0;
 int p2score = 0;
+int p1life = 5;
+int p2life = 5;
 
 //bullet
-float velocityOriginal = 0;
-float input = 0;
-float launchAngle = input * 180 / 3.1415926;
+float velocityOriginal;
+float launchAngle;
 float bulletX = tank1_posx + (tank_width / 2);
-float bulletY = tank1_posy + tank_height + 5;
+float bulletY = tank1_posy + (tank_width / 2);
 bool bulletFire = false;
-float bulletSize = 5;
+float bulletSize = 5; //radius
 int bullet_segments = 8;
 float windVelocity = 0;
 float ts = 0;
@@ -79,6 +76,33 @@ float ts = 0;
 bool player2 = false;
 bool gameStart = false;
 
+static float rotAngle1 = 0.0;
+static float rotAngle2 = 360.0;
+
+//trial spawn
+bool spawn = false;
+
+/*
+//ball shenanigans
+//ball1
+float bulletX = width / 2 + 10;
+float bulletY = height / 2;
+float ball_dirx = -1.0;
+float ball_diry = 1.0;
+
+//ball2
+float ball2_posx = width / 2 - 10;
+float ball2_posy = height / 2;
+float ball2_dirx = 1.0;
+float ball2_diry = -1.0;
+
+float ball_speedx1 = 4;
+float ball_speedy1 = 0;
+float ball_speedx2 = -4;
+float ball_speedy2 = 0;
+float ball_radius = 5;
+int ball_segments = 8;
+*/
 
 //function functions
 
@@ -102,7 +126,7 @@ return (n < upper) * n + !(n < upper) * upper;
 
 //keyboard controls
 void keyboard() {
-	//Player 1 controls
+	//gauge power
 	if (GetAsyncKeyState(VK_D))
 	{
 		if (gauge1_height <= gauge_maxheight)
@@ -119,37 +143,7 @@ void keyboard() {
 		}
 	}
 
-	if (GetAsyncKeyState(VK_W))
-	{
-		if ((launchAngle * 180 / 3.1415926)<180)
-		{
-			input +=2
-		}
-	}
-	
-	if (GetAsyncKeyState(VK_S))
-	{
-		if ((launchAngle * 180 / 3.1415926)>0)
-		{
-			input -=2
-		}
-	}
 
-	//Player 2 controls
-	{
-		if ((launchAngle * 180 / 3.1415926)<180)
-		{
-			input +=2
-		}
-	}
-	
-	if (GetAsyncKeyState(VK_DOWN))
-	{
-		if ((launchAngle * 180 / 3.1415926)>0)
-		{
-			input -=2
-		}
-	}
 	if (GetAsyncKeyState(VK_RIGHT))
 	{
 		if (gauge2_height <= gauge_maxheight)
@@ -158,12 +152,57 @@ void keyboard() {
 		}
 	}
 
-	if (GetAsyncKeyState(VK_LEFT))
+		if (GetAsyncKeyState(VK_LEFT))
 	{
-		if (gauge2_height > 1)
+		if (gauge2_height >= 1)
 		{
 			gauge2_height -= gauge_fill;
 		}
+	}
+
+	if (GetAsyncKeyState(VK_W))
+	{
+		if (rotAngle1 <= 180.0)
+		{
+			rotAngle1 += 1.0;
+		}
+	}
+
+	if (GetAsyncKeyState(VK_S))
+	{
+		if (rotAngle1 >= 1)
+		{
+			rotAngle1 -= 1.0;
+		}
+	}
+
+	if (GetAsyncKeyState(VK_UP))
+	{
+		if (rotAngle2 >= 180.0)
+		{
+			rotAngle2 -= 1.0;
+		}
+	}
+
+	if (GetAsyncKeyState(VK_DOWN))
+	{
+		if (rotAngle2 <= 360.0)
+		{
+			rotAngle2 += 1.0;
+		}
+	}
+
+	if (GetAsyncKeyState(VK_DOWN))
+	{
+		if (rotAngle2 <= 360.0)
+		{
+			rotAngle2 += 1.0;
+		}
+	}
+	
+	if (GetAsyncKeyState(VK_F))
+	{
+	
 	}
 }
 
@@ -194,6 +233,31 @@ void boxDraw(float x, float y, float width, float height) {
 	glEnd();
 }
 
+//line draw
+void lineDraw(float x1, float y1, float x2, float y2) {
+	glPushMatrix();
+	glTranslatef(x1, y1, 0.0f);
+	glRotatef(rotAngle1, 0.0f, 0.0f, 1.0f);
+	glTranslatef(-x1, -y1, 0.0f);
+	glBegin(GL_LINES);
+	glVertex3f(x1, y1, 0.0f);
+	glVertex3f(x2, y2, 0.0f);
+	glEnd();
+	glPopMatrix();
+}
+
+void line2Draw(float x1, float y1, float x2, float y2) {
+	glPushMatrix();
+	glTranslatef(x1, y1, 0.0f);
+	glRotatef(rotAngle2, 0.0f, 0.0f, 1.0f);
+	glTranslatef(-x1, -y1, 0.0f);
+	glBegin(GL_LINES);
+	glVertex3f(x1, y1, 0.0f);
+	glVertex3f(x2, y2, 0.0f);
+	glEnd();
+	glPopMatrix();
+}
+
 //draw the ball
 void ballDraw(float cx, float cy, float r, int segments) {
 	float theta = 2 * 3.1415926 / float(segments);
@@ -208,7 +272,8 @@ void ballDraw(float cx, float cy, float r, int segments) {
 	glBegin(GL_LINE_LOOP);
 	for (int i = 0; i < segments; i++) {
 		glVertex2f(varx + cx, vary + cy); //outputs vertex
-		  //apply rotation matrix
+
+										  //apply rotation matrix
 		t = varx;
 		varx = cos * varx - sin * vary;
 		vary = sin * t + cos * vary;
@@ -222,14 +287,14 @@ void boom()
 	if (player2 == true)
 	{
 		bulletX = tank1_posx + (tank_width / 2);
-		bulletY = tank1_posy + tank_height+5;
+		bulletY = tank1_posy + (tank_height / 2);
 		player2 = false;
 
 	}
 	else if (player2 == false)
 	{
 		bulletX = tank2_posx + (tank_width / 2);
-		bulletY = tank2_posy + tank_height+5;
+		bulletY = tank2_posy + (tank_height / 2);
 		player2 = true;
 
 	}
@@ -246,7 +311,7 @@ void bulletMove()
 		}
 		else if (player2 == true)
 		{
-			bulletX -= ((velocityOriginal + windVelocity)*t)*cos(launchAngle);
+			bulletX -= ((velocityOriginal + windVelocity)*ts)*cos(launchAngle);
 			bulletY += (velocityOriginal*ts)*sin(launchAngle) - ((9.8*(ts*ts)) / 2);
 		}
 
@@ -282,6 +347,7 @@ void collisionChecker() {
 			{
 				p2score += 1;
 			}
+			p1life -= 1;
 			boom();
 		}
 		if ((bulletX >= tank2_posx) &&
@@ -293,6 +359,7 @@ void collisionChecker() {
 			{
 				p1score += 1;
 			}
+			p2life -= 1;
 			boom();
 		}
 	}
@@ -322,9 +389,13 @@ void draw() {
 	boxDraw(p1gauge_posx, gauge_posy, gauge_width, gauge1_height);
 	boxDraw(p2gauge_posx, gauge_posy, gauge_width, gauge2_height);
 
+	//line
+	lineDraw((tank1_posx + (tank_width/2)), (tank1_posy + (tank_height/2)), (tank1_posx + 50), (tank1_posy + (tank_height / 2)));
+	line2Draw((tank2_posx + (tank_width/2)), (tank2_posy + (tank_height / 2)), (tank2_posx - 30), (tank2_posy + (tank_height / 2)));
+
+
 	//score display
 	textDraw(width / 2 - 30, height - 30, inttostr(p1score) + " : " + inttostr(p2score));
-	textDraw(width - 60, height - 25, inttostr(launchAngle) + " deg");
 
 	//swapping buffers
 	glutSwapBuffers();
@@ -340,7 +411,7 @@ void update(int upvalue) {
 
 	if (gameStart == true)
 	{
-		ts += 1/60;
+		ts += 1;
 	}
 	//ball2Move();
 
@@ -357,7 +428,7 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(width, height);
-	glutCreateWindow("Worchbound");
+	glutCreateWindow("Le GunBound");
 
 	//uses the void functions
 	glutDisplayFunc(draw);
@@ -373,4 +444,8 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-//there's no god in coding
+//wake me up
+//wake me up inside
+//cant wake up
+//wake me up inside
+//save meeee
