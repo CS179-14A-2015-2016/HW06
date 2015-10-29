@@ -20,6 +20,7 @@
 #define VK_D 0x44
 #define VK_F 0x46
 #define VK_L 0x4C
+#define VK_SPACE 0x20
 
 using namespace std;
 
@@ -56,31 +57,33 @@ float gauge_maxheight = gauge_posy + 30;
 float gauge_fill = 2;
 
 //scoring
-int p1score = 0;
-int p2score = 0;
 int p1life = 5;
 int p2life = 5;
 
 //bullet
-float velocityOriginal;
-float launchAngle;
-float bulletX = tank1_posx + (tank_width / 2);
-float bulletY = tank1_posy + (tank_width / 2);
-bool bulletFire = false;
+float velocityX1;
+float velocityY1;
+float velocityX2;
+float velocityY2;
+float theta1;
+float theta2;
+float bulletX1 = 0.0;
+float bulletY1 = 0.0;
+float bulletX2 = 0.0;
+float bulletY2 = 0.0;
 float bulletSize = 5; //radius
 int bullet_segments = 8;
 float windVelocity = 0;
 float ts = 0;
 
-//turns
+//bools
 bool player2 = false;
 bool gameStart = false;
+bool p1fire = false;
+bool p2fire = false;
 
 static float rotAngle1 = 0.0;
 static float rotAngle2 = 360.0;
-
-//trial spawn
-bool spawn = false;
 
 /*
 //ball shenanigans
@@ -127,7 +130,7 @@ return (n < upper) * n + !(n < upper) * upper;
 //keyboard controls
 void keyboard() {
 	//gauge power
-	if (GetAsyncKeyState(VK_D))
+	if (GetAsyncKeyState(VK_W))
 	{
 		if (gauge1_height <= gauge_maxheight)
 		{
@@ -135,7 +138,7 @@ void keyboard() {
 		}
 	}
 
-	if (GetAsyncKeyState(VK_A))
+	if (GetAsyncKeyState(VK_S))
 	{
 		if (gauge1_height > 1)
 		{
@@ -144,7 +147,7 @@ void keyboard() {
 	}
 
 
-	if (GetAsyncKeyState(VK_RIGHT))
+	if (GetAsyncKeyState(VK_UP))
 	{
 		if (gauge2_height <= gauge_maxheight)
 		{
@@ -152,7 +155,7 @@ void keyboard() {
 		}
 	}
 
-		if (GetAsyncKeyState(VK_LEFT))
+		if (GetAsyncKeyState(VK_DOWN))
 	{
 		if (gauge2_height >= 1)
 		{
@@ -160,7 +163,7 @@ void keyboard() {
 		}
 	}
 
-	if (GetAsyncKeyState(VK_W))
+	if (GetAsyncKeyState(VK_A))
 	{
 		if (rotAngle1 <= 180.0)
 		{
@@ -168,15 +171,15 @@ void keyboard() {
 		}
 	}
 
-	if (GetAsyncKeyState(VK_S))
+	if (GetAsyncKeyState(VK_D))
 	{
-		if (rotAngle1 >= 1)
+		if (rotAngle1 >= 2)
 		{
 			rotAngle1 -= 1.0;
 		}
 	}
 
-	if (GetAsyncKeyState(VK_UP))
+	if (GetAsyncKeyState(VK_RIGHT))
 	{
 		if (rotAngle2 >= 180.0)
 		{
@@ -184,7 +187,7 @@ void keyboard() {
 		}
 	}
 
-	if (GetAsyncKeyState(VK_DOWN))
+	if (GetAsyncKeyState(VK_LEFT))
 	{
 		if (rotAngle2 <= 360.0)
 		{
@@ -199,13 +202,40 @@ void keyboard() {
 			rotAngle2 += 1.0;
 		}
 	}
-	
+
 	if (GetAsyncKeyState(VK_F))
 	{
+		bulletX2 = 0;
+		bulletY2 = 0;
+		velocityX2 = 0;
+		velocityY2 = 0;
+		bulletX1 = tank1_posx + (tank_width / 2);
+		bulletY1 = tank1_posy + (tank_width / 2);
+		velocityX1 = gauge1_height / 5;
+		velocityY1 = gauge1_height / 5;
+		theta1 = (3.1415926 / 180) * rotAngle1;
+
+	}
+
+	if (GetAsyncKeyState(VK_L))
+	{
+		bulletX1 = 0;
+		bulletY1 = 0;
+		velocityX1 = 0;
+		velocityY1 = 0;
+		bulletX2 = tank2_posx + (tank_width / 2);
+		bulletY2 = tank2_posy + (tank_width / 2);
+		velocityX2 = gauge2_height / 5;
+		velocityY2 = gauge2_height / 5;
+		theta2 = (3.1415926 / 180) * (rotAngle2 - 180);
+
+	}
 	
+	if (GetAsyncKeyState(VK_SPACE))
+	{
+		gameStart = true;
 	}
 }
-
 
 //makes gl recognized 2d usage
 void use2D(int width, int height) {
@@ -283,20 +313,59 @@ void ballDraw(float cx, float cy, float r, int segments) {
 
 void boom()
 {
-	gameStart = false;
-	if (player2 == true)
+	if (player2 == false)
 	{
-		bulletX = tank1_posx + (tank_width / 2);
-		bulletY = tank1_posy + (tank_height / 2);
-		player2 = false;
-
-	}
-	else if (player2 == false)
-	{
-		bulletX = tank2_posx + (tank_width / 2);
-		bulletY = tank2_posy + (tank_height / 2);
+		bulletX1 = tank1_posx + (tank_width / 2);
+		bulletY1 = tank1_posy + (tank_height / 2);
 		player2 = true;
+	}
+	else if (player2 == true)
+	{
+		bulletX2 = tank2_posx + (tank_width / 2);
+		bulletY2 = tank2_posy + (tank_height / 2);
+		player2 = false;
+	}
+}
 
+void collisionChecker() {
+	//left wall collision
+	if ((bulletX1 < 0) || (bulletX2 < 0)) {
+		boom();
+	}
+
+	//right wall collision
+	if ((bulletX1 > width) || (bulletX2 > width)) {
+		boom();
+	}
+
+	//top /bot wall collision
+	if ((bulletY1 > height - 20 || bulletY1 < 10) || (bulletY2 > height - 20 || bulletY2 < 10))
+	{
+		boom();
+	}
+
+	//tank collision
+	if ((bulletX2 >= tank1_posx) &&
+		(bulletX2 <= tank1_posx + tank_width) &&
+		(bulletY2 <= tank1_posy + tank_height) &&
+		(bulletY2 >= tank1_posy))
+	{
+		if (player2 == true)
+		{
+			p1life -= 1;
+		}
+		boom();
+	}
+	if ((bulletX1 >= tank2_posx) &&
+		(bulletX1 <= tank2_posx + tank_width) &&
+		(bulletY1 <= tank2_posy + tank_height) &&
+		(bulletY1 >= tank2_posy))
+	{
+		if (player2 == false)
+		{
+			p2life -= 1;
+		}
+		boom();
 	}
 }
 
@@ -306,64 +375,39 @@ void bulletMove()
 	{
 		if (player2 == false)
 		{
-			bulletX += ((velocityOriginal + windVelocity)*ts)*cos(launchAngle);
-			bulletY += (velocityOriginal*ts)*sin(launchAngle) - ((9.8*(ts*ts)) / 2);
+			bulletX1 += velocityX1*cos(theta1);
+			bulletY1 += velocityY1*sin(theta1);
+			collisionChecker();
 		}
+
+		else if (player2 == true)
+		{
+			bulletX2 += velocityX2*cos(theta2);
+			bulletY2 += velocityY2*sin(theta2);
+			collisionChecker();
+		}		
+
+		/*
+		
+		if (player2 == false)
+		{
+			bulletX += ((velocityOriginal + windVelocity)*ts)*cos(rotAngle1);
+			bulletY += (velocityOriginal*ts)*sin(rotAngle1) - ((9.8*(ts*ts)) / 2);
+		}
+		
 		else if (player2 == true)
 		{
 			bulletX -= ((velocityOriginal + windVelocity)*ts)*cos(launchAngle);
 			bulletY += (velocityOriginal*ts)*sin(launchAngle) - ((9.8*(ts*ts)) / 2);
 		}
+		*/
 
 	}
 
 
 }
 
-void collisionChecker() {
-	//left wall collision
-	if (bulletX < 0) {
-		boom();
-	}
 
-	//right wall collision
-	if (bulletX > width) {
-		boom();
-	}
-
-	//top /bot wall collision
-	if (bulletY > height - 20 || bulletY < 10)
-	{
-		boom();
-	}
-	if (gameStart = true)
-	{
-		if ((bulletX >= tank1_posx) &&
-			(bulletX <= tank1_posx + tank_width) &&
-			(bulletY <= tank1_posy + tank_height) &&
-			(bulletY >= tank1_posy))
-		{
-			if (player2 == true)
-			{
-				p2score += 1;
-			}
-			p1life -= 1;
-			boom();
-		}
-		if ((bulletX >= tank2_posx) &&
-			(bulletX <= tank2_posx + tank_width) &&
-			(bulletY <= tank2_posy + tank_height) &&
-			(bulletY >= tank2_posy))
-		{
-			if (player2 == false)
-			{
-				p1score += 1;
-			}
-			p2life -= 1;
-			boom();
-		}
-	}
-}
 
 //draw on screen
 void draw() {
@@ -374,7 +418,9 @@ void draw() {
 	//put draw codes below
 
 	//ball display
-	ballDraw(bulletX, bulletY, bulletSize, bullet_segments);
+	ballDraw(bulletX1, bulletY1, bulletSize, bullet_segments);
+	ballDraw(bulletX2, bulletY2, bulletSize, bullet_segments);
+
 	//ballDraw(ball2_posx, ball2_posy, ball_radius, ball_segments);
 
 	//land display
@@ -395,7 +441,7 @@ void draw() {
 
 
 	//score display
-	textDraw(width / 2 - 30, height - 30, inttostr(p1score) + " : " + inttostr(p2score));
+	textDraw(width / 2 - 30, height - 30, inttostr(rotAngle1) + " " + inttostr(p1life) + " : " + inttostr(p2life) + " " + inttostr(abs(rotAngle2 - 360)));
 
 	//swapping buffers
 	glutSwapBuffers();
@@ -406,14 +452,7 @@ void update(int upvalue) {
 	//input
 	keyboard();
 
-	//ball movement
 	bulletMove();
-
-	if (gameStart == true)
-	{
-		ts += 1;
-	}
-	//ball2Move();
 
 	//calls update in millisecs
 	glutTimerFunc(refresh, update, 0);
