@@ -72,10 +72,10 @@ float velocityX2;
 float velocityY2;
 float theta1;
 float theta2;
-float bulletX1 = 0.0;
-float bulletY1 = 0.0;
-float bulletX2 = 0.0;
-float bulletY2 = 0.0;
+float bulletX1 = tank1_posx + tank_width/2;
+float bulletY1 = tank1_posy + (tank_height + 5);
+float bulletX2 = tank2_posx + tank_width / 2;
+float bulletY2 = tank2_posy + (tank_height + 5);
 float bulletSize = 5; //radius
 int bullet_segments = 8;
 float windVelocity = 0;
@@ -92,27 +92,6 @@ bool p2fire = false;
 static float rotAngle1 = 0.0;
 static float rotAngle2 = 360.0;
 
-/*
-//ball shenanigans
-//ball1
-float bulletX = width / 2 + 10;
-float bulletY = height / 2;
-float ball_dirx = -1.0;
-float ball_diry = 1.0;
-
-//ball2
-float ball2_posx = width / 2 - 10;
-float ball2_posy = height / 2;
-float ball2_dirx = 1.0;
-float ball2_diry = -1.0;
-
-float ball_speedx1 = 4;
-float ball_speedy1 = 0;
-float ball_speedx2 = -4;
-float ball_speedy2 = 0;
-float ball_radius = 5;
-int ball_segments = 8;
-*/
 
 //function functions
 
@@ -132,119 +111,109 @@ string inttostr(int x) {
 	return convs.str();
 }
 
-/*
-//clamp function
-float clamp(float n, float lower, float upper) {
-n = (n > lower) * n + !(n > lower) * lower;
-return (n < upper) * n + !(n < upper) * upper;
-}
-*/
-
 //void functions
 
 //keyboard controls
 void keyboard() {
-	//gauge power
-	if (GetAsyncKeyState(VK_W))
+	if (player2 == false && p1fire == false)
 	{
-		if (gauge1_height <= gauge_maxheight)
+		if (GetAsyncKeyState(VK_W))
 		{
-			gauge1_height += gauge_fill;
+			if (gauge1_height <= gauge_maxheight)
+			{
+				gauge1_height += gauge_fill;
+			}
+		}
+
+		if (GetAsyncKeyState(VK_S))
+		{
+			if (gauge1_height > 1)
+			{
+				gauge1_height -= gauge_fill;
+			}
+		}
+
+		if (GetAsyncKeyState(VK_A))
+		{
+			if (rotAngle1 <= 180.0)
+			{
+				rotAngle1 += 1.0;
+			}
+		}
+
+		if (GetAsyncKeyState(VK_D))
+		{
+			if (rotAngle1 >= 2)
+			{
+				rotAngle1 -= 1.0;
+			}
+		}
+		if (GetAsyncKeyState(VK_F))
+		{
+			p1fire = true;
+			gameStart = true;
+			bulletX2 = tank2_posx + tank_width/2;
+			bulletY2 = tank2_posy + (tank_height + 5);
+			velocityX2 = 0;
+			velocityY2 = 0;
+			storewind2 = 0;
+			storewind1 = windVelocity;
+			bulletX1 = tank1_posx + (tank_width / 2);
+			bulletY1 = tank1_posy + (tank_width +5);
+			velocityX1 = gauge1_height / 5;
+			velocityY1 = gauge1_height / 5;
+			theta1 = (3.1415926 / 180) * rotAngle1;
 		}
 	}
-
-	if (GetAsyncKeyState(VK_S))
+	if (player2 == true && p2fire == false)
 	{
-		if (gauge1_height > 1)
+		if (GetAsyncKeyState(VK_UP))
 		{
-			gauge1_height -= gauge_fill;
+			if (gauge2_height <= gauge_maxheight)
+			{
+				gauge2_height += gauge_fill;
+			}
 		}
-	}
-
-
-	if (GetAsyncKeyState(VK_UP))
-	{
-		if (gauge2_height <= gauge_maxheight)
-		{
-			gauge2_height += gauge_fill;
-		}
-	}
 
 		if (GetAsyncKeyState(VK_DOWN))
-	{
-		if (gauge2_height >= 1)
 		{
-			gauge2_height -= gauge_fill;
+			if (gauge2_height >= 1)
+			{
+				gauge2_height -= gauge_fill;
+			}
 		}
-	}
 
-	if (GetAsyncKeyState(VK_A))
-	{
-		if (rotAngle1 <= 180.0)
+		if (GetAsyncKeyState(VK_RIGHT))
 		{
-			rotAngle1 += 1.0;
+			if (rotAngle2 >= 180.0)
+			{
+				rotAngle2 -= 1.0;
+			}
 		}
-	}
 
-	if (GetAsyncKeyState(VK_D))
-	{
-		if (rotAngle1 >= 2)
+		if (GetAsyncKeyState(VK_LEFT))
 		{
-			rotAngle1 -= 1.0;
+			if (rotAngle2 <= 360.0)
+			{
+				rotAngle2 += 1.0;
+			}
 		}
-	}
-
-	if (GetAsyncKeyState(VK_RIGHT))
-	{
-		if (rotAngle2 >= 180.0)
+		if (GetAsyncKeyState(VK_L))
 		{
-			rotAngle2 -= 1.0;
+			gameStart = true;
+			p2fire = true;
+			bulletX1 = tank1_posx + tank_width/2;
+			bulletY1 = tank1_posy + (tank_height + 5);
+			velocityX1 = 0;
+			velocityY1 = 0;
+			storewind1 = 0;
+			storewind2 = windVelocity;
+			bulletX2 = tank2_posx + (tank_width / 2);
+			bulletY2 = tank2_posy + (tank_width / 2);
+			velocityX2 = gauge2_height / 5;
+			velocityY2 = gauge2_height / 5;
+			theta2 = (3.1415926 / 180) * (rotAngle2 - 180);
 		}
-	}
-
-	if (GetAsyncKeyState(VK_LEFT))
-	{
-		if (rotAngle2 <= 360.0)
-		{
-			rotAngle2 += 1.0;
-		}
-	}
-
-	if (GetAsyncKeyState(VK_F))
-	{
-		bulletX2 = 0;
-		bulletY2 = 0;
-		velocityX2 = 0;
-		velocityY2 = 0;
-		storewind2 = 0;
-		storewind1 = windVelocity;
-		bulletX1 = tank1_posx + (tank_width / 2);
-		bulletY1 = tank1_posy + (tank_width / 2);
-		velocityX1 = gauge1_height / 5;
-		velocityY1 = gauge1_height / 5;
-		theta1 = (3.1415926 / 180) * rotAngle1;
-
-	}
-
-	if (GetAsyncKeyState(VK_L))
-	{
-		bulletX1 = 0;
-		bulletY1 = 0;
-		velocityX1 = 0;
-		velocityY1 = 0;
-		storewind1 = 0;
-		storewind2 = windVelocity;
-		bulletX2 = tank2_posx + (tank_width / 2);
-		bulletY2 = tank2_posy + (tank_width / 2);
-		velocityX2 = gauge2_height / 5;
-		velocityY2 = gauge2_height / 5;
-		theta2 = (3.1415926 / 180) * (rotAngle2 - 180);
-
-	}
-	
-	if (GetAsyncKeyState(VK_SPACE))
-	{
-		gameStart = true;
 	}
 }
 
@@ -393,6 +362,7 @@ void bulletMove()
 			bulletX1 += velocityX1*cos(theta1)*ts + storewind2;
 			bulletY1 += velocityY1*sin(theta1)*ts - ((ts*ts*9.8)/2);
 			collisionChecker();
+			ts += 1/600;
 		}
 
 		else if (player2 == true)
@@ -400,26 +370,9 @@ void bulletMove()
 			bulletX2 += velocityX2*cos(theta2)*ts + storewind2;
 			bulletY2 += velocityY2*sin(theta2)*ts - ((ts*ts*9.8)/2);
 			collisionChecker();
+			ts += 1/600;
 		}		
-
-		/*
-		
-		if (player2 == false)
-		{
-			bulletX += ((velocityOriginal + windVelocity)*ts)*cos(rotAngle1);
-			bulletY += (velocityOriginal*ts)*sin(rotAngle1) - ((9.8*(ts*ts)) / 2);
-		}
-		
-		else if (player2 == true)
-		{
-			bulletX -= ((velocityOriginal + windVelocity)*ts)*cos(launchAngle);
-			bulletY += (velocityOriginal*ts)*sin(launchAngle) - ((9.8*(ts*ts)) / 2);
-		}
-		*/
-
 	}
-
-
 }
 
 
@@ -468,7 +421,7 @@ void update(int upvalue) {
 	keyboard();
 
 	bulletMove();
-	ts += 1/600;
+
 
 	//calls update in millisecs
 	glutTimerFunc(refresh, update, 0);
