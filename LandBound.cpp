@@ -81,7 +81,7 @@ int bullet_segments = 8;
 float windVelocity = 0;
 float storewind1 = 0;
 float storewind2 = 0;
-float ts = 0;
+float ts = 1/60;
 
 //bools
 bool player2 = false;
@@ -299,7 +299,7 @@ void boom()
 		bulletY1 = tank1_posy + (tank_height / 2);
 		windVelocity = steprand();
 		player2 = true;
-		ts = 0;
+	
 	}
 	else if (player2 == true)
 	{
@@ -307,7 +307,7 @@ void boom()
 		bulletY2 = tank2_posy + (tank_height / 2);
 		windVelocity = steprand();
 		player2 = false;
-		ts = 0;
+	
 	}
 }
 
